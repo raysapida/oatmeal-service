@@ -1,15 +1,15 @@
 class TwitterController < ApplicationController
   def index
-    # TODO: Create model for saving Tweets in the database
-    # @tweets = Tweet.all
-    @tweets = []
-
+    @tweets = Tweet.all
     render json: { tweets: @tweets }
   end
 
   def search
     twitter = TwitterClient.new
     @tweets = twitter.client.search(params[:q], result_type: "recent").take(10)
+    @tweets.each do |tweet|
+      Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at)
+    end
     render json: { status: 'ok' , tweets: @tweets }
   end
 

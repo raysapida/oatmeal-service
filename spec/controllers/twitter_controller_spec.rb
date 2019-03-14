@@ -14,10 +14,15 @@ RSpec.describe TwitterController, type: :controller do
       get :search, params: { format: :json, q: '#healthcare' }
       json = JSON.parse(response.body)
 
-      p json['tweets']
       expect(response).to be_successful
       expect(json['status']).to eq 'ok'
       expect(json['tweets'].size).to eq 10
+    end
+
+    it 'should save tweets found into the database' do
+      expect{
+        get :search, params: { format: :json, q: '#healthcare' }
+      }.to change(Tweet, :count).by(10)
     end
   end
 end
