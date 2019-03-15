@@ -6,9 +6,10 @@ class TwitterController < ApplicationController
 
   def search
     twitter = TwitterClient.new
-    @tweets = twitter.client.search(params[:q], result_type: "recent").take(10)
+    search_term = params[:q]
+    @tweets = twitter.client.search("##{search_term}", result_type: "recent").take(10)
     @tweets.each do |tweet|
-      Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at)
+      Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at, search_term: search_term)
     end
     render json: { status: 'ok' , tweets: @tweets }
   end
