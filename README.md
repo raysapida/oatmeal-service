@@ -1,24 +1,17 @@
-# README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Installation
 
-Things you may want to cover:
+`bundle install`
 
-* Ruby version
+`rails db:create`
 
-* System dependencies
+`rails db:migrate`
 
-* Configuration
+## API
 
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+* Two endpoints at `/api/twitter` and `/api/search`
+* Both endpoints accept a `q` query string such as `?q=healthcare` or `?q=open%20source`
+* The `/api/search` also starts an ActiveJob that queries for new tweets in 5 minute
+intervals. This ActiveJob isn't backed by a 3rd-party library and stores the job in
+memory; the jobs have to be added back if the process crashes.
+* In heroku, I populated the tweets using curl to hit the `/api/search` endpoint
