@@ -1,15 +1,17 @@
 class TwitterController < ApplicationController
   def index
-    @tweets = Tweet.all
+    search_term = params[:q]
+    @tweets = Tweet.where(search_term: search_term).order(created_at: :desc).limit(10)
     render json: { tweets: @tweets }
   end
 
   def search
     twitter = TwitterClient.new
     search_term = params[:q]
-    @tweets = twitter.client.search("##{search_term}", result_type: "recent").take(10)
-    @tweets.each do |tweet|
-      Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at, search_term: search_term)
+    tweets = twitter.client.search("##{search_term}", result_type: "recent").take(10)
+    @tweets = []
+    tweets.each do |tweet|
+      @tweets << Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at, search_term: search_term)
     end
     render json: { status: 'ok' , tweets: @tweets }
   end
