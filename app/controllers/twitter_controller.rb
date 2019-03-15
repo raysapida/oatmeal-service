@@ -13,6 +13,7 @@ class TwitterController < ApplicationController
     tweets.each do |tweet|
       @tweets << Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at, search_term: search_term)
     end
+    TweetsUpdateJob.perform_later(search_term)
     render json: { status: 'ok' , tweets: @tweets }
   end
 

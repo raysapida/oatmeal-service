@@ -1,19 +1,16 @@
 class TweetsUpdateJob < ApplicationJob
   queue_as :urgent
 
-  def perform(*args)
+  def perform(search_term)
     begin
       twitter = TwitterClient.new
-      search_terms = ['healthcare', 'nasa', 'open source']
-      search_terms.each do |search_term|
-        tweets = twitter.client.search("##{search_term}", result_type: "recent").take(10)
-        tweets.each do |tweet|
-          Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at, search_term: search_term)
-        end
+      tweets = twitter.client.search("##{search_term}", result_type: "recent").take(10)
+      tweets.each do |tweet|
+        Tweet.create(full_text: tweet.full_text, screen_name: tweet.user.screen_name, created_at: tweet.created_at, search_term: search_term)
       end
-      self.class.set(wait: 5.minutes).perform_later('')
+      self.class.set(wait: 5.minutes).perform_later(search_term)
     rescue HTTP::ConnectionError
-      self.class.set(wait: 5.minutes).perform_later('')
+      self.class.set(wait: 5.minutes).perform_later(search_term)
     end
   end
 
